@@ -11,16 +11,12 @@ XDOINFO=$(xdotool getmouselocation)
 XPOS=$(echo "${XDOINFO}" | awk '{ print $1 }' | cut -b3-)
 YPOS=$(echo "${XDOINFO}" | awk '{ print $2 }' | cut -b3-)
 while true; do
-	CURXDOINFO=$(xdotool getmouselocation)
-	CURXPOS=$(echo "${CURXDOINFO}" | awk '{ print $1 }' | cut -b3-)
-	CURYPOS=$(echo "${CURXDOINFO}" | awk '{ print $2 }' | cut -b3-)
 	SLS=$(xset q | grep LED | awk '{ print $10 }' | sed 's/^0*//')
 	if [ "${SLS}" == "" ]; then
 		SLS=0
 	fi
 	if (((${SLS} & 4) == 4)); then
-		xdotool mousemove --sync $XPOS $YPOS click 1
-		xdotool mousemove $CURXPOS $CURYPOS
+		xdotool mousemove --sync $XPOS $YPOS click 1 mousemove --sync restore
 	fi
 	sleep .1
 done
