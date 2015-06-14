@@ -13,6 +13,13 @@ function checkScrollLock {
 	fi
 }
 
+# check that xdotool is installed and exit if it isn't
+XDOINSTALLED=$(which xdotool | wc -l)
+if [ $XDOINSTALLED -eq 0 ]; then
+	echo "ALERT: xdotool required, but not found!"
+	exit
+fi
+
 # hackey for scroll lock
 XMM=$(xmodmap -pm | grep Scroll_Lock | wc -l)
 if [ $XMM -ne 1 ]; then
