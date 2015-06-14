@@ -19,12 +19,21 @@ if [ $XMM -ne 1 ]; then
 	$(xmodmap -e "add mod3 = Scroll_Lock")
 fi
 
-XDOINFO=$(xdotool getmouselocation)
-XPOS=$(echo "${XDOINFO}" | awk '{ print $1 }' | cut -b3-)
-YPOS=$(echo "${XDOINFO}" | awk '{ print $2 }' | cut -b3-)
+ACTIVE=false
+
 while true; do
 	if checkScrollLock; then
+		if ! $ACTIVE; then
+			ACTIVE=true
+			XDOINFO=$(xdotool getmouselocation)
+			XPOS=$(echo "${XDOINFO}" | awk '{ print $1 }' | cut -b3-)
+			YPOS=$(echo "${XDOINFO}" | awk '{ print $2 }' | cut -b3-)
+		fi
 		xdotool mousemove --sync $XPOS $YPOS click 1 mousemove --sync restore
+	else
+		if $ACTIVE; then
+			ACTIVE=false
+		fi
 	fi
 	sleep .1
 done
