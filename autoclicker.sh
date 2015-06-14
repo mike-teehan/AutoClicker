@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# check the state of the scroll lock key and return true if it is on, false if not
 function checkScrollLock {
 	SLS=$(xset q | grep LED | awk '{ print $10 }' | sed 's/^0*//')
 	if [ "${SLS}" == "" ]; then
@@ -21,6 +22,7 @@ fi
 
 ACTIVE=false
 
+# just loop forever (quit with ctrl-c)
 while true; do
 	if checkScrollLock; then
 		if ! $ACTIVE; then
