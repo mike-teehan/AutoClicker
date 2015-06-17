@@ -1,28 +1,18 @@
 #!/bin/bash
 
-# check the state of the scroll lock key and return true if it is on, false if not
-function checkScrollLock {
-	SLS=$(xset q | grep LED | awk '{ print $10 }' | sed 's/^0*//')
-	if [ "${SLS}" == "" ]; then
-		SLS=0
-	fi
-	if (((${SLS} & 4) == 4)); then
-		return 0	#true
-	else
-		return 1	#false
-	fi
-}
+CAPS=1
+SCROLL=4
 
-# check the state of the caps lock key and return true if it is on, false if not
-function checkCapsLock {
+# check the state of the caps/scroll lock key and return true if it is on, false if not
+function checkLockKey {
 	SLS=$(xset q | grep LED | awk '{ print $10 }' | sed 's/^0*//')
 	if [ "${SLS}" == "" ]; then
 		SLS=0
 	fi
-	if (((${SLS} & 1) == 1)); then
-		return 0	#true
+	if ((($SLS & $1) == $1)); then
+		return 0	# true
 	else
-		return 1	#false
+		return 1	# false
 	fi
 }
 
@@ -44,14 +34,14 @@ ACTIVE=false
 
 # just loop forever (quit with ctrl-c)
 while true; do
-	if checkScrollLock; then
+	if checkLockKey $SCROLL; then
 		if ! $ACTIVE; then
 			ACTIVE=true
 			XDOINFO=$(xdotool getmouselocation)
 			XPOS=$(echo "${XDOINFO}" | awk '{ print $1 }' | cut -b3-)
 			YPOS=$(echo "${XDOINFO}" | awk '{ print $2 }' | cut -b3-)
 		fi
-		if ! checkCapsLock; then
+		if ! checkLockKey $CAPS; then
 			xdotool mousemove --sync $XPOS $YPOS click 1 mousemove --sync restore
 		fi
 	else
