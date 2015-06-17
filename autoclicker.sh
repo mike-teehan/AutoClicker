@@ -13,6 +13,19 @@ function checkScrollLock {
 	fi
 }
 
+# check the state of the caps lock key and return true if it is on, false if not
+function checkCapsLock {
+	SLS=$(xset q | grep LED | awk '{ print $10 }' | sed 's/^0*//')
+	if [ "${SLS}" == "" ]; then
+		SLS=0
+	fi
+	if (((${SLS} & 1) == 1)); then
+		return 0	#true
+	else
+		return 1	#false
+	fi
+}
+
 # check that xdotool is installed and exit if it isn't
 XDOINSTALLED=$(which xdotool | wc -l)
 if [ $XDOINSTALLED -eq 0 ]; then
@@ -38,7 +51,9 @@ while true; do
 			XPOS=$(echo "${XDOINFO}" | awk '{ print $1 }' | cut -b3-)
 			YPOS=$(echo "${XDOINFO}" | awk '{ print $2 }' | cut -b3-)
 		fi
-		xdotool mousemove --sync $XPOS $YPOS click 1 mousemove --sync restore
+		if ! checkCapsLock; then
+			xdotool mousemove --sync $XPOS $YPOS click 1 mousemove --sync restore
+		fi
 	else
 		if $ACTIVE; then
 			ACTIVE=false
